@@ -1,4 +1,6 @@
+import os
 import yfinance as yf
+import pandas as pd
 
 
 def fetch_stock_data(ticker, period='1mo'):
@@ -41,3 +43,27 @@ def notify_if_strong_fluctuations(data, threshold):
             print(f"Колебания цены составляют {fluctuation:.2f}%, что ниже порога {threshold}%.")
     else:
         print("Колонка 'Close' отсутствует в данных.")
+
+
+def export_data_to_csv(data, filename, user_inputs):
+    """
+    Экспортирует данные и параметры пользователя в CSV файл.
+    :param data: DataFrame с данными акций
+    :param filename: Имя файла для сохранения
+    :param user_inputs: Словарь с запросами пользователя (например, тикер, период, порог)
+    """
+    if not filename.endswith('.csv'):
+        filename += '.csv'
+
+    # Папка для сохранения
+    folder = "exported_data"
+    os.makedirs(folder, exist_ok=True)
+    file_path = os.path.join(folder, filename)
+
+    # Добавляем параметры пользователя в файл
+    metadata = pd.DataFrame([user_inputs])
+    metadata.to_csv(file_path, index=False)
+
+    # Сохраняем данные акций
+    data.to_csv(file_path, mode='a', index=False)
+    print(f"Данные и параметры пользователя успешно сохранены в файл {file_path}")
