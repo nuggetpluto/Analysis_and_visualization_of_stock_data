@@ -67,3 +67,36 @@ def export_data_to_csv(data, filename, user_inputs):
     # Сохраняем данные акций
     data.to_csv(file_path, mode='a', index=False)
     print(f"Данные и параметры пользователя успешно сохранены в файл {file_path}")
+
+
+def calculate_rsi(data, window=14):
+    """
+    Рассчитывает RSI (индекс относительной силы) для данных акций.
+    :param data: DataFrame с колонкой 'Close'
+    :param window: Длина окна для расчёта RSI (по умолчанию 14)
+    :return: DataFrame с добавленным столбцом 'RSI'
+    """
+    delta = data['Close'].diff(1)
+    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+
+    rs = gain / loss
+    data['RSI'] = 100 - (100 / (1 + rs))
+    return data
+
+
+def calculate_macd(data, short_window=12, long_window=26, signal_window=9):
+
+    """
+    Рассчитывает MACD и сигнальную линию.
+    :param data: DataFrame с колонкой 'Close'
+    :param short_window: Период короткого скользящего среднего (по умолчанию 12)
+    :param long_window: Период длинного скользящего среднего (по умолчанию 26)
+    :param signal_window: Период сигнальной линии (по умолчанию 9)
+    :return: DataFrame с добавленными столбцами 'MACD' и 'Signal_Line'
+    """
+    data['EMA12'] = data['Close'].ewm(span=short_window, adjust=False).mean()
+    data['EMA26'] = data['Close'].ewm(span=long_window, adjust=False).mean()
+    data['MACD'] = data['EMA12'] - data['EMA26']
+    data['Signal_Line'] = data['MACD'].ewm(span=signal_window, adjust=False).mean()
+    return data

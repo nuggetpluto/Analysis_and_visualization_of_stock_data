@@ -20,6 +20,10 @@ def main():
     # Fetch stock data
     stock_data = dd.fetch_stock_data(ticker, period)
 
+    # Рассчитываем RSI и MACD
+    stock_data = dd.calculate_rsi(stock_data)
+    stock_data = dd.calculate_macd(stock_data)
+
     # Уведомление о сильных колебаниях
     dd.notify_if_strong_fluctuations(stock_data, threshold)
 
@@ -38,7 +42,7 @@ def main():
     dd.export_data_to_csv(stock_data, export_filename, user_inputs)
 
     # Построение и сохранение графика
-    graph_filename = f"{ticker}_{period}_chart.png"
+    graph_filename = f"{ticker}_{period}_chart_with_indicators.png"
     dplt.create_and_save_plot(stock_data, ticker, period, filename=graph_filename)
 
 
