@@ -3,9 +3,27 @@ import yfinance as yf
 import pandas as pd
 
 
-def fetch_stock_data(ticker, period='1mo'):
+def fetch_stock_data(ticker, start=None, end=None, period=None):
+    """
+    Загружает данные акций с Yahoo Finance.
+    :param ticker: Тикер акции
+    :param start: Дата начала в формате 'YYYY-MM-DD'
+    :param end: Дата окончания в формате 'YYYY-MM-DD'
+    :param period: Предустановленный период (например, '1mo', '1d')
+    :return: DataFrame с историческими данными
+    """
     stock = yf.Ticker(ticker)
-    data = stock.history(period=period)
+
+    if start and end:
+        print(f"Загрузка данных для {ticker} с {start} по {end}...")
+        data = stock.history(start=start, end=end)
+    elif period:
+        print(f"Загрузка данных для {ticker} за период {period}...")
+        data = stock.history(period=period)
+    else:
+        print("Ошибка: необходимо указать либо период, либо даты начала и окончания.")
+        return pd.DataFrame()
+
     return data
 
 
@@ -86,7 +104,6 @@ def calculate_rsi(data, window=14):
 
 
 def calculate_macd(data, short_window=12, long_window=26, signal_window=9):
-
     """
     Рассчитывает MACD и сигнальную линию.
     :param data: DataFrame с колонкой 'Close'
